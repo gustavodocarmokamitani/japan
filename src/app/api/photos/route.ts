@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
+import bundledManifest from "@/data/album-manifest.json";
 
 const MEDIA_DIR = process.env.ALBUM_MEDIA_DIR;
+
+// Where the bytes live. Set to the R2 bucket's public URL in production; when
+// unset the local /api/media route serves them off ALBUM_MEDIA_DIR instead, so
+// the gallery still runs before anything has been published.
+const MEDIA_BASE_URL = process.env.MEDIA_BASE_URL?.replace(/\/+$/, "");
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 200;
@@ -62,30 +68,46 @@ function byTakenAt(a: ManifestItem, b: ManifestItem): number {
   return a.takenAt.localeCompare(b.takenAt) || a.id.localeCompare(b.id);
 }
 
-function readManifest(manifestPath: string): ManifestItem[] | null {
-  const { mtimeMs } = fs.statSync(manifestPath);
-  if (cache && cache.mtimeMs === mtimeMs) return cache.items;
+// Two sources, in priority order:
+//   1. ALBUM_MEDIA_DIR/manifest.json — present in local dev, and refreshed by
+//      every ingest run, so newly converted media appears without republishing.
+//   2. src/data/album-manifest.json — committed, bundled into the deployment.
+//      This is what production reads; Vercel has no media directory.
+function loadManifest(): ManifestItem[] | null {
+  const manifestPath = MEDIA_DIR ? path.join(MEDIA_DIR, "manifest.json") : null;
 
-  try {
-    const items: ManifestItem[] = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-    items.sort(byTakenAt);
-    cache = { mtimeMs, items };
-    return items;
-  } catch (error) {
-    console.error("[api/photos] Failed to parse manifest.json:", error);
-    return null;
+  if (manifestPath && fs.existsSync(manifestPath)) {
+    const { mtimeMs } = fs.statSync(manifestPath);
+    if (cache && cache.mtimeMs === mtimeMs) return cache.items;
+    try {
+      const items: ManifestItem[] = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+      items.sort(byTakenAt);
+      cache = { mtimeMs, items };
+      return items;
+    } catch (error) {
+      console.error("[api/photos] Failed to parse manifest.json, using bundled copy:", error);
+    }
   }
+
+  if (cache && cache.mtimeMs === 0) return cache.items;
+  const items = [...(bundledManifest as ManifestItem[])].sort(byTakenAt);
+  cache = { mtimeMs: 0, items };
+  return items;
 }
 
 function dayKeyOf(takenAt: string | null): string | null {
   return takenAt ? dayKeyFormatter.format(new Date(takenAt)) : null;
 }
 
+function mediaUrl(bucket: "full" | "thumb", filename: string): string {
+  return MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/${bucket}/${filename}` : `/api/media/${bucket}/${filename}`;
+}
+
 function toPhoto(item: ManifestItem): Photo {
   return {
     id: item.id,
-    url: `/api/media/full/${item.id}.${item.isVideo ? "mp4" : "jpg"}`,
-    thumbUrl: `/api/media/thumb/${item.id}.jpg`,
+    url: mediaUrl("full", `${item.id}.${item.isVideo ? "mp4" : "jpg"}`),
+    thumbUrl: mediaUrl("thumb", `${item.id}.jpg`),
     width: item.width ?? 1000,
     height: item.height ?? 1000,
     takenAt: item.takenAt,
@@ -117,9 +139,9 @@ function parsePositiveInt(raw: string | null, fallback: number, max: number): nu
 }
 
 // Media is pre-processed offline by scripts/ingest-album.mjs (HEIC/MOV from a
-// Google Takeout export converted to web-friendly JPEG/MP4) into
-// ALBUM_MEDIA_DIR, alongside a manifest.json index. This route just reads
-// that manifest — no live scraping, no network calls.
+// Google Takeout export converted to web-friendly JPEG/MP4), then published to
+// R2 by scripts/publish-r2.mjs. This route only reads the manifest index — no
+// live scraping, no network calls.
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const pageSize = parsePositiveInt(url.searchParams.get("pageSize"), DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
@@ -127,13 +149,8 @@ export async function GET(request: Request) {
   const day = url.searchParams.get("day");
   const city = url.searchParams.get("city");
 
-  if (!MEDIA_DIR) return emptyResponse("not-configured", pageSize);
-
-  const manifestPath = path.join(MEDIA_DIR, "manifest.json");
-  if (!fs.existsSync(manifestPath)) return emptyResponse("empty", pageSize);
-
-  const manifest = readManifest(manifestPath);
-  if (!manifest) return emptyResponse("error", pageSize);
+  const manifest = loadManifest();
+  if (!manifest || manifest.length === 0) return emptyResponse("empty", pageSize);
 
   // Filter chips are built from the whole manifest, not just the current page —
   // otherwise the available days/cities would change as you page through.
@@ -169,6 +186,6 @@ export async function GET(request: Request) {
     hasMore: page < totalPages,
     days,
     cities: Array.from(citySet),
-    source: "local",
+    source: "album",
   });
 }

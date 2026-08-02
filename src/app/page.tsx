@@ -153,9 +153,9 @@ export default function GalleryPage() {
         const res = await fetch(`/api/photos?${query}`);
         const json: PhotosResponse = await res.json();
         if (cancelled) return;
-        // Only stand in for a missing/unconfigured album — a filter that
-        // legitimately matches nothing should say so, not show stock photos.
-        setData(json.source === "local" ? json : FALLBACK_RESPONSE);
+        // Only stand in for a missing album — a filter that legitimately
+        // matches nothing should say so, not show stock photos.
+        setData(json.source === "album" ? json : FALLBACK_RESPONSE);
       } catch {
         if (cancelled) return;
         setData(FALLBACK_RESPONSE);
