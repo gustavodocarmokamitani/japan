@@ -1,26 +1,213 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #0d0d0d;
+  --foreground: #ffffff;
+  --card: #121212;
+  --card-foreground: #ffffff;
+  --popover: #121212;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #0d0d0d;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
+  --muted-foreground: #a1a1aa;
+  --accent: #1a1a1a;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #888888;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #0d0d0d;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: #888888;
+}
+
+.dark {
+  --background: #0d0d0d;
+  --foreground: #ffffff;
+  --card: #121212;
+  --card-foreground: #ffffff;
+  --popover: #121212;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #0d0d0d;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a1a;
+  --muted-foreground: #a1a1aa;
+  --accent: #1a1a1a;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #888888;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #0d0d0d;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: #888888;
+}
+
+/* Film grade — started as a CSS take on the Lightroom preset and was then
+   tuned warmer and brighter, for a trip that should read as cheerful rather
+   than nostalgic. CSS filters have no tone curve, so the look is split in
+   two: `filter` carries exposure/contrast/white balance, and three overlay
+   layers fake what it cannot — lifted shadows, a soft airy haze, the
+   vignette, and the grain. Every knob is a variable so the look can be tuned
+   in one place without touching the selectors. */
+:root {
+  --grade-brightness: 1.02; /* opens the photos up instead of darkening them */
+  --grade-contrast: 1.06; /* gentle pop — heavy contrast reads dramatic */
+  --grade-saturate: 1.4; /* lets neon, food and blossoms carry the mood */
+  --grade-sepia: 0.06; /* a hint of sun, short of a muddy vintage cast */
+  --grade-hue: -3deg;
+  --grade-haze: 0.05; /* light lift for an airy, almost pastel shadow */
+  --grade-vignette: 0.1; /* barely there; a strong one closes the frame in */
+  --grade-grain: 0.12; /* just enough texture to not look clinical */
+}
+
+.photo-grade {
+  position: relative;
+  display: block;
+  /* Keeps the blend modes below from reaching the page background. */
+  isolation: isolate;
+}
+
+.photo-grade > img {
+  display: block;
+  filter: brightness(var(--grade-brightness)) contrast(var(--grade-contrast))
+    saturate(var(--grade-saturate)) sepia(var(--grade-sepia))
+    hue-rotate(var(--grade-hue));
+}
+
+/* Haze: screen-blending a low-alpha wash lifts the blacks without flattening
+   the midtones, the way raising shadows on a raw file does. Warm at the top
+   and cool at the bottom is a split tone — sun overhead, open sky in the
+   shadows — which keeps the lift from reading as grey murk. */
+.photo-grade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* ::before is the first child, and the filter on the <img> makes it a
+     stacking context painted alongside the positioned pseudo-elements — so
+     without an explicit z-index the haze would land underneath the photo. */
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    180deg,
+    rgb(255 220 180 / var(--grade-haze)),
+    rgb(150 190 215 / calc(var(--grade-haze) * 0.7))
+  );
+}
+
+.photo-grade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 55%,
+    rgb(0 0 0 / var(--grade-vignette)) 100%
+  );
+}
+
+/* Grain needs its own element rather than a third background layer: the two
+   pseudo-elements are spoken for, and layering it onto either of them would
+   force it to share that layer's opacity and blend mode. fractalNoise emits a
+   noisy alpha channel too, so the tile is already translucent speckle;
+   feColorMatrix just drains the colour out of it. */
+.photo-grade-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: var(--grade-grain);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 160px 160px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }
