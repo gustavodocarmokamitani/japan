@@ -1,16 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import Image from "next/image";
+import { ChevronDown, ChevronLeft, ChevronRight, Play, Trash2 } from "lucide-react";
 import { GradedImage } from "@/components/graded-image";
 import { GalleryPagination } from "@/components/gallery-pagination";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 50;
@@ -238,6 +241,44 @@ export default function GalleryPage() {
   }, [selectedPhotoId, goToPrev, goToNext]);
 
   const selectedDayLabel = selectedDay ? days.find((d) => d.key === selectedDay)?.label ?? null : null;
+
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [removePassword, setRemovePassword] = useState("");
+  const [removeError, setRemoveError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
+
+  const confirmRemove = useCallback(async () => {
+    if (!selected) return;
+    setRemoving(true);
+    setRemoveError(null);
+    try {
+      const res = await fetch("/api/photos/remove", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selected.id, password: removePassword }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setRemoveError(typeof body.error === "string" ? body.error : "Não foi possível remover.");
+        return;
+      }
+      const removedId = selected.id;
+      // Password stays in state (not persisted) so removing several photos in
+      // one sitting doesn't mean retyping it each time.
+      const nextId = hasNext ? items[selectedIndex + 1].id : hasPrev ? items[selectedIndex - 1].id : null;
+      setData((prev) =>
+        prev
+          ? { ...prev, photos: prev.photos.filter((p) => p.id !== removedId), total: Math.max(0, prev.total - 1) }
+          : prev,
+      );
+      setSelectedPhotoId(nextId);
+      setRemoveDialogOpen(false);
+    } catch {
+      setRemoveError("Falha de rede. Tente de novo.");
+    } finally {
+      setRemoving(false);
+    }
+  }, [selected, removePassword, hasNext, hasPrev, items, selectedIndex]);
 
   return (
     <div className="mx-auto max-w-[1800px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16">
@@ -494,6 +535,72 @@ export default function GalleryPage() {
           </span>
         </button>
       )}
+      {selected && (
+        // Top-left, clear of the close button (top-right, inside the popup)
+        // and of the nav buttons on the side edges.
+        <button
+          type="button"
+          onClick={() => {
+            setRemoveError(null);
+            setRemoveDialogOpen(true);
+          }}
+          aria-label="Remover esta foto"
+          className="fixed top-4 left-4 z-[60] flex size-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-red-500/70"
+        >
+          <Trash2 size={18} />
+        </button>
+      )}
+
+      <Dialog
+        open={removeDialogOpen}
+        onOpenChange={(open) => {
+          setRemoveDialogOpen(open);
+          if (!open) setRemoveError(null);
+        }}
+      >
+        <DialogContent>
+          <DialogTitle>Remover foto</DialogTitle>
+          <DialogDescription>
+            A foto sai da galeria (continua guardada — dá pra restaurar se for engano).
+          </DialogDescription>
+          {selected && (
+            <div className="flex justify-center py-2">
+              <Image
+                src={selected.thumbUrl}
+                alt=""
+                width={96}
+                height={96}
+                className="h-24 w-24 rounded-lg object-cover"
+              />
+            </div>
+          )}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              confirmRemove();
+            }}
+            className="flex flex-col gap-3"
+          >
+            <input
+              type="password"
+              value={removePassword}
+              onChange={(e) => setRemovePassword(e.target.value)}
+              placeholder="Senha"
+              autoFocus
+              className="w-full rounded-lg border border-white/15 bg-transparent px-3 py-2 text-sm text-white outline-none focus:border-white/40"
+            />
+            {removeError && <p className="text-xs text-red-400">{removeError}</p>}
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => setRemoveDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" variant="destructive" disabled={removing || !removePassword}>
+                {removing ? "Removendo…" : "Remover"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

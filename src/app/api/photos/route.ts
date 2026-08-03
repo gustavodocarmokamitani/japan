@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "node:fs";
-import path from "node:path";
-import bundledManifest from "@/data/album-manifest.json";
-
-const MEDIA_DIR = process.env.ALBUM_MEDIA_DIR;
+import { loadManifest, type ManifestItem } from "@/lib/manifest";
+import { getRemovedIds } from "@/lib/r2";
 
 // Where the bytes live. Set to the R2 bucket's public URL in production; when
 // unset the local /api/media route serves them off ALBUM_MEDIA_DIR instead, so
@@ -40,59 +37,6 @@ export interface Photo {
   lat: number | null;
   lon: number | null;
   city: string | null;
-}
-
-interface ManifestItem {
-  id: string;
-  isVideo: boolean;
-  takenAt: string | null;
-  width: number | null;
-  height: number | null;
-  lat: number | null;
-  lon: number | null;
-  city?: string | null;
-}
-
-// The manifest grows to a few thousand entries, and it is re-read on every
-// gallery page change. Cache the parsed array and invalidate on mtime so a
-// still-running ingest still shows up without a server restart.
-let cache: { mtimeMs: number; items: ManifestItem[] } | null = null;
-
-// Chronological, with undated items last. The ingest script already writes the
-// manifest in this order, but paging makes the order load-bearing — a photo
-// landing on the wrong page is not something the viewer can scroll past — so
-// the API sorts rather than trusting the file it was handed.
-function byTakenAt(a: ManifestItem, b: ManifestItem): number {
-  if (!a.takenAt) return b.takenAt ? 1 : a.id.localeCompare(b.id);
-  if (!b.takenAt) return -1;
-  return a.takenAt.localeCompare(b.takenAt) || a.id.localeCompare(b.id);
-}
-
-// Two sources, in priority order:
-//   1. ALBUM_MEDIA_DIR/manifest.json — present in local dev, and refreshed by
-//      every ingest run, so newly converted media appears without republishing.
-//   2. src/data/album-manifest.json — committed, bundled into the deployment.
-//      This is what production reads; Vercel has no media directory.
-function loadManifest(): ManifestItem[] | null {
-  const manifestPath = MEDIA_DIR ? path.join(MEDIA_DIR, "manifest.json") : null;
-
-  if (manifestPath && fs.existsSync(manifestPath)) {
-    const { mtimeMs } = fs.statSync(manifestPath);
-    if (cache && cache.mtimeMs === mtimeMs) return cache.items;
-    try {
-      const items: ManifestItem[] = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-      items.sort(byTakenAt);
-      cache = { mtimeMs, items };
-      return items;
-    } catch (error) {
-      console.error("[api/photos] Failed to parse manifest.json, using bundled copy:", error);
-    }
-  }
-
-  if (cache && cache.mtimeMs === 0) return cache.items;
-  const items = [...(bundledManifest as ManifestItem[])].sort(byTakenAt);
-  cache = { mtimeMs: 0, items };
-  return items;
 }
 
 function dayKeyOf(takenAt: string | null): string | null {
@@ -149,8 +93,23 @@ export async function GET(request: Request) {
   const day = url.searchParams.get("day");
   const city = url.searchParams.get("city");
 
-  const manifest = loadManifest();
-  if (!manifest || manifest.length === 0) return emptyResponse("empty", pageSize);
+  const rawManifest = loadManifest();
+  if (!rawManifest || rawManifest.length === 0) return emptyResponse("empty", pageSize);
+
+  // Removed photos stay in the manifest and in R2 — only this block list
+  // (kept in R2 alongside the media, see src/lib/r2.ts) says they shouldn't
+  // be served. A failure here should not take the whole gallery down, so a
+  // removed photo staying visible briefly is preferable to a broken page.
+  let removedIds: Set<string>;
+  try {
+    removedIds = await getRemovedIds();
+  } catch (error) {
+    console.error("[api/photos] Failed to load removed-photo list:", error);
+    removedIds = new Set();
+  }
+  const manifest: ManifestItem[] = removedIds.size
+    ? rawManifest.filter((item) => !removedIds.has(item.id))
+    : rawManifest;
 
   // Filter chips are built from the whole manifest, not just the current page —
   // otherwise the available days/cities would change as you page through.
