@@ -18,7 +18,7 @@ export const storyChapters: StoryChapter[] = [
     title: "Guarulhos", // TODO: revise o título (nome real do destino)
     dateLabel: "14 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["5299f0f5bac0582d", "1271d508cd099403", "4ec8546113484b00", "20535d0f55774458", "4d4d0482503da849", "cf0033efb8aa7556"],
+    photoIds: ["b6d8838c69ba664e", "20535d0f55774458", "4d4d0482503da849", "f790b975e444c7db", "e9db04b7f19d9b57", "87080d7f71fb6b7f"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -26,7 +26,7 @@ export const storyChapters: StoryChapter[] = [
     title: "Chiyoda", // TODO: revise o título (nome real do destino)
     dateLabel: "15 de abr. - 16 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["b4d79c987e17991a", "b9daaad5f3d1589c", "951c00bfb0615503", "ef3046103f30f697", "0a742b49d5eb16dc", "c26fa3264fbfb54e"],
+    photoIds: ["48a0a53a6833d5d5", "fdba0add6f6fd239", "24b6e0dfd002c16e", "be28a72ab3e0b624", "9116fb3079f636cb", "ef3046103f30f697"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -34,56 +34,56 @@ export const storyChapters: StoryChapter[] = [
     title: "Urayasu", // TODO: revise o título (nome real do destino)
     dateLabel: "17 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["478ca719e61c95eb", "f754e717af62a36a", "1bf5d2985ccba848", "b9b8775aa9bd8004", "7f40443615c9a444", "551cf8552b6e7531"],
+    photoIds: ["c8183bdda12617c0", "f754e717af62a36a", "6fd87f9291d49e4e", "ca44818829f968d9", "a46939dc50ab5fbc", "3d1be11b7aef0acd"],
   },
   {
     id: "chapter-4",
     title: "Kanazawa", // TODO: revise o título (nome real do destino)
     dateLabel: "18 de abr. - 19 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["41e87b032ff9128c", "c9d278873cc6ba1c", "b1234d47c4801f0f", "f8af401f2406ebe8", "869e94724f7e6adb", "edec11ab9cc92b30"],
+    photoIds: ["3e0906ccb3a93aac", "c851edad93c971aa", "2144d5f06db8e480", "f1d22558bc389bba", "f5068b9866a5fdf2", "45cfe6f9f1581f2a"],
   },
   {
     id: "chapter-5",
     title: "Quioto", // TODO: revise o título (nome real do destino)
     dateLabel: "20 de abr. - 21 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["3ff633be625d5054", "0bda9b60a4e8a7f2", "3b9ad58dc3f12184", "e1faf6912396539a", "375c02b707a1b487", "be163fb78ee8dc98"],
+    photoIds: ["1b3a933ba44ebd1b", "5e41621a18c46e69", "3b9ad58dc3f12184", "e1faf6912396539a", "a58ab8fc362082f3", "7a23d0dd206803d1"],
   },
   {
     id: "chapter-6",
     title: "Hiroshima", // TODO: revise o título (nome real do destino)
     dateLabel: "22 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["01af9befe7878653", "dab72242004bbdf5", "6221d11a20d285e1", "929f20acf619c8f2", "618ec0a06dc5ee4b", "0ec5691d312a35e8"],
+    photoIds: ["7c075c336832981e", "f39fd7fc8976e4fd", "dab72242004bbdf5", "26742e5b89d89b29", "295636fd359f16ea", "c86b35e712e90067"],
   },
   {
     id: "chapter-7",
     title: "Hatsukaichi", // TODO: revise o título (nome real do destino)
     dateLabel: "23 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["2d2feb24068c4c0a", "4646207e4f427c97", "08a092f681cc8460", "4ae0d173f7c81b8c", "52acccf8238005f1", "dc3ca71fa118d9b8"],
+    photoIds: ["4ae0d173f7c81b8c", "4646207e4f427c97", "a3e2e6e208371815", "9e9b4f7d871e9f00", "544d4ec8704d74ae", "4ab05147a59a2ff8"],
   },
   {
     id: "chapter-8",
     title: "Osaka", // TODO: revise o título (nome real do destino)
     dateLabel: "24 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["e371f09c2e42905e", "9b136d2e0140a296", "4abb88dbd0da75f5", "603886000203d0f1", "fc03e99370526a68", "977f3f5ddf5ca4a2"],
+    photoIds: ["dc3ca71fa118d9b8", "fa73ab97d45f9742", "505384259607fa20", "4d8ed80c256fe9a6", "1d34b67ecfb33545", "977f3f5ddf5ca4a2"],
   },
   {
     id: "chapter-9",
     title: "Nara", // TODO: revise o título (nome real do destino)
     dateLabel: "25 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["24cb254559e3215d", "fac621daf68dbd78", "acfc813338b88a71", "84a3e6d1be4d443e", "6faffa586c32df0d", "74268a1869f64b44"],
+    photoIds: ["d19a33f0842986b2", "3e14aba94b1de677", "2c52e5e9d5aea490", "84a3e6d1be4d443e", "8fcce60d42a7dad8", "7803d2c4c67d71ac"],
   },
   {
     id: "chapter-10",
     title: "Osaka", // TODO: revise o título (nome real do destino)
     dateLabel: "26 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["399deebbc5ec2615", "2531616ba68783e6", "bbbe51af4aa92922", "cd9129351c1161af", "370912235c9e9be9", "4779cac31da1482d"],
+    photoIds: ["fbe5613f10fe4901", "2531616ba68783e6", "bbbe51af4aa92922", "cd9129351c1161af", "839a15464a2b292a", "4779cac31da1482d"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -91,7 +91,7 @@ export const storyChapters: StoryChapter[] = [
     title: "Chiyoda", // TODO: revise o título (nome real do destino)
     dateLabel: "27 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["ab2aa7ee24edb543", "4695bd5ef01e780b", "e355497bb39a1a67", "1a1ac88282720871"],
+    photoIds: ["c8183bdda12617c0", "3a316cc75899653c", "4695bd5ef01e780b", "c04953b07973aa06", "1a1ac88282720871", "c859da6adbd69ad4"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -99,7 +99,7 @@ export const storyChapters: StoryChapter[] = [
     title: "Taito", // TODO: revise o título (nome real do destino)
     dateLabel: "28 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["443adb5e1eac7f55", "8a2d1c6c47754195", "ed2a7746b4254dac", "514405fcff4a6d43", "140a682541d4e14e", "54cc526214749175"],
+    photoIds: ["443adb5e1eac7f55", "8a2d1c6c47754195", "c0142bac75a2dddf", "514405fcff4a6d43", "140a682541d4e14e", "30306e72f7cbbbb1"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -107,7 +107,7 @@ export const storyChapters: StoryChapter[] = [
     title: "Shibuya", // TODO: revise o título (nome real do destino)
     dateLabel: "29 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["8b640f31031a4970", "546163832fe62bbc", "d9b49c51836625dc", "4aaf75aaccb78cba", "14989da2cf362a84", "52717714e3b27047"],
+    photoIds: ["ac504fb814b2578c", "52717714e3b27047", "3637cc94dc8c54f6", "891d1ce1940ee5b4"],
   },
   {
     // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
@@ -115,14 +115,6 @@ export const storyChapters: StoryChapter[] = [
     title: "Shinjuku", // TODO: revise o título (nome real do destino)
     dateLabel: "30 de abr.",
     text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["c1d8438f0574b001", "c73c43d1efe549c7", "97e46536faf6c1d9", "f2cd94d2bfdf7dfb", "6d232a045dcc3626", "09c7f5e0e1dfcdf9"],
-  },
-  {
-    // TODO: bairro de Tóquio — considere renomear/mesclar com outros capítulos de Tóquio.
-    id: "chapter-15",
-    title: "Ota", // TODO: revise o título (nome real do destino)
-    dateLabel: "01 de mai. - 02 de mai.",
-    text: "TODO: escreva aqui a história desse trecho da viagem.",
-    photoIds: ["1afa33f27d4ae537", "aac0245a8165ec1d", "0f427362c0372eb6", "56c53ed50dc12bd7", "9d0d1a10bfb4e5e6", "6b95b6d85adc5df5"],
+    photoIds: ["5ddddf1f8f475a44", "d94fb597615f4aaf", "97e46536faf6c1d9", "ca0b8d4b0d3133ad", "1c48cb47f0e0759a", "09c7f5e0e1dfcdf9"],
   },
 ];
