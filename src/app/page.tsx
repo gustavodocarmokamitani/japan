@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { GradedImage } from "@/components/graded-image";
 import { GalleryPagination } from "@/components/gallery-pagination";
 import {
@@ -132,6 +132,11 @@ export default function GalleryPage() {
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  // Filter chips wrap into a wall of pills on narrow screens, so on mobile
+  // each group hides behind a toggle button and only the active group's
+  // chips are shown; sm: and up ignore this and always show both rows.
+  const [dayFilterOpen, setDayFilterOpen] = useState(false);
+  const [cityFilterOpen, setCityFilterOpen] = useState(false);
   const columns = useColumnCount();
   const gridRef = useRef<HTMLDivElement>(null);
   const isFirstLoad = useRef(true);
@@ -204,6 +209,35 @@ export default function GalleryPage() {
   }, [items, columns]);
 
   const selected = selectedPhotoId ? items.find((item) => item.id === selectedPhotoId) ?? null : null;
+  const selectedIndex = selectedPhotoId ? items.findIndex((item) => item.id === selectedPhotoId) : -1;
+  const hasPrev = selectedIndex > 0;
+  const hasNext = selectedIndex !== -1 && selectedIndex < items.length - 1;
+
+  const goToPrev = useCallback(() => {
+    setSelectedPhotoId((current) => {
+      const idx = items.findIndex((item) => item.id === current);
+      return idx > 0 ? items[idx - 1].id : current;
+    });
+  }, [items]);
+
+  const goToNext = useCallback(() => {
+    setSelectedPhotoId((current) => {
+      const idx = items.findIndex((item) => item.id === current);
+      return idx !== -1 && idx < items.length - 1 ? items[idx + 1].id : current;
+    });
+  }, [items]);
+
+  useEffect(() => {
+    if (!selectedPhotoId) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft") goToPrev();
+      else if (e.key === "ArrowRight") goToNext();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedPhotoId, goToPrev, goToNext]);
+
+  const selectedDayLabel = selectedDay ? days.find((d) => d.key === selectedDay)?.label ?? null : null;
 
   return (
     <div className="mx-auto max-w-[1800px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16">
@@ -217,66 +251,100 @@ export default function GalleryPage() {
       </header>
 
       {days.length > 1 && (
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mb-10">
           <button
             type="button"
-            onClick={() => changeFilter(() => setSelectedDay(null))}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-              selectedDay === null
-                ? "border-white bg-white text-black"
-                : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
-            )}
+            onClick={() => setDayFilterOpen((v) => !v)}
+            aria-expanded={dayFilterOpen}
+            className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
           >
-            Todas
+            <span>Filtrar por datas{selectedDayLabel ? ` · ${selectedDayLabel}` : ""}</span>
+            <ChevronDown size={14} className={cn("shrink-0 transition-transform", dayFilterOpen && "rotate-180")} />
           </button>
-          {days.map((day) => (
+          <div className={cn("flex-wrap gap-2 sm:flex", dayFilterOpen ? "flex" : "hidden")}>
             <button
-              key={day.key}
               type="button"
-              onClick={() => changeFilter(() => setSelectedDay(day.key))}
+              onClick={() => {
+                changeFilter(() => setSelectedDay(null));
+                setDayFilterOpen(false);
+              }}
               className={cn(
-                "rounded-full border px-3 py-1 text-xs font-light tracking-wide capitalize transition-colors",
-                selectedDay === day.key
+                "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
+                selectedDay === null
                   ? "border-white bg-white text-black"
                   : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
               )}
             >
-              {day.label}
+              Todas
             </button>
-          ))}
+            {days.map((day) => (
+              <button
+                key={day.key}
+                type="button"
+                onClick={() => {
+                  changeFilter(() => setSelectedDay(day.key));
+                  setDayFilterOpen(false);
+                }}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-light tracking-wide capitalize transition-colors",
+                  selectedDay === day.key
+                    ? "border-white bg-white text-black"
+                    : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                )}
+              >
+                {day.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {cities.length > 1 && (
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mb-10">
           <button
             type="button"
-            onClick={() => changeFilter(() => setSelectedCity(null))}
-            className={cn(
-              "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-              selectedCity === null
-                ? "border-white bg-white text-black"
-                : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
-            )}
+            onClick={() => setCityFilterOpen((v) => !v)}
+            aria-expanded={cityFilterOpen}
+            className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
           >
-            Todos os lugares
+            <span>Filtrar por cidades{selectedCity ? ` · ${selectedCity}` : ""}</span>
+            <ChevronDown size={14} className={cn("shrink-0 transition-transform", cityFilterOpen && "rotate-180")} />
           </button>
-          {cities.map((city) => (
+          <div className={cn("flex-wrap gap-2 sm:flex", cityFilterOpen ? "flex" : "hidden")}>
             <button
-              key={city}
               type="button"
-              onClick={() => changeFilter(() => setSelectedCity(city))}
+              onClick={() => {
+                changeFilter(() => setSelectedCity(null));
+                setCityFilterOpen(false);
+              }}
               className={cn(
                 "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-                selectedCity === city
+                selectedCity === null
                   ? "border-white bg-white text-black"
                   : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
               )}
             >
-              {city}
+              Todos os lugares
             </button>
-          ))}
+            {cities.map((city) => (
+              <button
+                key={city}
+                type="button"
+                onClick={() => {
+                  changeFilter(() => setSelectedCity(city));
+                  setCityFilterOpen(false);
+                }}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
+                  selectedCity === city
+                    ? "border-white bg-white text-black"
+                    : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                )}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -395,6 +463,37 @@ export default function GalleryPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {selected && hasPrev && (
+        // Rendered outside the dialog (fixed to the viewport, not to the
+        // image-hugging popup) with a wide tap zone and a safe margin from
+        // the backdrop — for wide photos the popup nearly fills the screen,
+        // so a button glued to its edge left a near-zero-margin strip where
+        // a slightly-off tap hit the backdrop and closed the whole viewer
+        // instead of advancing.
+        <button
+          type="button"
+          onClick={goToPrev}
+          aria-label="Foto anterior"
+          className="fixed top-1/2 left-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-start pl-2 sm:w-24 sm:pl-4"
+        >
+          <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
+            <ChevronLeft size={20} />
+          </span>
+        </button>
+      )}
+      {selected && hasNext && (
+        <button
+          type="button"
+          onClick={goToNext}
+          aria-label="Próxima foto"
+          className="fixed top-1/2 right-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-end pr-2 sm:w-24 sm:pr-4"
+        >
+          <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
+            <ChevronRight size={20} />
+          </span>
+        </button>
+      )}
     </div>
   );
 }

@@ -48,7 +48,10 @@ function sleep(ms) {
 }
 
 async function reverseGeocode(lat, lon) {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=pt-BR`;
+  // Falls back to English (romanized) instead of the local script when a
+  // Portuguese name isn't available, so small JP municipalities don't show
+  // up as kanji among the Portuguese/English city names.
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=pt-BR,en`;
   const res = await fetch(url, {
     headers: { "User-Agent": "japan-trip-gallery/1.0 (personal project, single-run geocoding script)" },
   });
