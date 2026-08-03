@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadManifest, type ManifestItem } from "@/lib/manifest";
 import { getRemovedIds } from "@/lib/r2";
-
-// Where the bytes live. Set to the R2 bucket's public URL in production; when
-// unset the local /api/media route serves them off ALBUM_MEDIA_DIR instead, so
-// the gallery still runs before anything has been published.
-const MEDIA_BASE_URL = process.env.MEDIA_BASE_URL?.replace(/\/+$/, "");
+import { toPhoto } from "@/lib/photo";
 
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 200;
@@ -26,40 +22,8 @@ const dayLabelFormatter = new Intl.DateTimeFormat("pt-BR", {
   timeZone: TRIP_TIME_ZONE,
 });
 
-export interface Photo {
-  id: string;
-  url: string;
-  thumbUrl: string;
-  width: number;
-  height: number;
-  takenAt: string | null;
-  isVideo: boolean;
-  lat: number | null;
-  lon: number | null;
-  city: string | null;
-}
-
 function dayKeyOf(takenAt: string | null): string | null {
   return takenAt ? dayKeyFormatter.format(new Date(takenAt)) : null;
-}
-
-function mediaUrl(bucket: "full" | "thumb", filename: string): string {
-  return MEDIA_BASE_URL ? `${MEDIA_BASE_URL}/${bucket}/${filename}` : `/api/media/${bucket}/${filename}`;
-}
-
-function toPhoto(item: ManifestItem): Photo {
-  return {
-    id: item.id,
-    url: mediaUrl("full", `${item.id}.${item.isVideo ? "mp4" : "jpg"}`),
-    thumbUrl: mediaUrl("thumb", `${item.id}.jpg`),
-    width: item.width ?? 1000,
-    height: item.height ?? 1000,
-    takenAt: item.takenAt,
-    isVideo: item.isVideo,
-    lat: item.lat,
-    lon: item.lon,
-    city: item.city ?? null,
-  };
 }
 
 function emptyResponse(source: string, pageSize: number) {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronDown, ChevronLeft, ChevronRight, Play, Trash2 } from "lucide-react";
 import { GradedImage } from "@/components/graded-image";
 import { GalleryPagination } from "@/components/gallery-pagination";
+import { StorySection, type ResolvedStoryChapter } from "@/components/story-section";
 import {
   Dialog,
   DialogContent,
@@ -129,6 +130,7 @@ const FALLBACK_RESPONSE: PhotosResponse = {
 };
 
 export default function GalleryPage() {
+  const [storyChapters, setStoryChapters] = useState<ResolvedStoryChapter[]>([]);
   const [data, setData] = useState<PhotosResponse | null>(null);
   const [loadedQuery, setLoadedQuery] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -152,6 +154,19 @@ export default function GalleryPage() {
   if (selectedCity) params.set("city", selectedCity);
   const query = params.toString();
   const loading = loadedQuery !== query;
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/story")
+      .then((res) => res.json())
+      .then((json: { chapters: ResolvedStoryChapter[] }) => {
+        if (!cancelled) setStoryChapters(json.chapters ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -291,6 +306,8 @@ export default function GalleryPage() {
         </p>
       </header>
 
+      <StorySection chapters={storyChapters} />
+
       {days.length > 1 && (
         <div className="mb-10">
           <button
@@ -396,7 +413,7 @@ export default function GalleryPage() {
         </p>
       )}
 
-      <div ref={gridRef} className="scroll-mt-10">
+      <div id="gallery" ref={gridRef} className="scroll-mt-10">
         {data === null ? (
           <SkeletonGrid />
         ) : items.length === 0 ? (
