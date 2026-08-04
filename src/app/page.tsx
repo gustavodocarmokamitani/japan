@@ -2,10 +2,20 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronLeft, ChevronRight, Play, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Trash2,
+} from "lucide-react";
 import { GradedImage } from "@/components/graded-image";
+import { HeroMarquee } from "@/components/hero-marquee";
 import { GalleryPagination } from "@/components/gallery-pagination";
-import { StorySection, type ResolvedStoryChapter } from "@/components/story-section";
+import {
+  StorySection,
+  type ResolvedStoryChapter,
+} from "@/components/story-section";
 import {
   Dialog,
   DialogContent,
@@ -43,15 +53,123 @@ interface PhotosResponse {
 }
 
 const FALLBACK_PHOTOS: GalleryPhoto[] = [
-  { id: "fallback-1", url: "https://images.unsplash.com/photo-1554080353-a576cf803bda?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1554080353-a576cf803bda?w=800&q=80", width: 1200, height: 1500, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-2", url: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80", width: 1600, height: 1067, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-3", url: "https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=800&q=80", width: 1200, height: 1600, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-4", url: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80", width: 1600, height: 1200, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-5", url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80", width: 1200, height: 1500, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-6", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=80", width: 1600, height: 1067, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-7", url: "https://images.unsplash.com/photo-1511300636408-a63a89df3482?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1511300636408-a63a89df3482?w=800&q=80", width: 1200, height: 1600, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-8", url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80", width: 1600, height: 1200, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
-  { id: "fallback-9", url: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&q=80", thumbUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80", width: 1200, height: 1500, takenAt: null, isVideo: false, lat: null, lon: null, city: null },
+  {
+    id: "fallback-1",
+    url: "https://images.unsplash.com/photo-1554080353-a576cf803bda?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1554080353-a576cf803bda?w=800&q=80",
+    width: 1200,
+    height: 1500,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-2",
+    url: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80",
+    width: 1600,
+    height: 1067,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-3",
+    url: "https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=800&q=80",
+    width: 1200,
+    height: 1600,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-4",
+    url: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80",
+    width: 1600,
+    height: 1200,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-5",
+    url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80",
+    width: 1200,
+    height: 1500,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-6",
+    url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&q=80",
+    width: 1600,
+    height: 1067,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-7",
+    url: "https://images.unsplash.com/photo-1511300636408-a63a89df3482?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1511300636408-a63a89df3482?w=800&q=80",
+    width: 1200,
+    height: 1600,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-8",
+    url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80",
+    width: 1600,
+    height: 1200,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
+  {
+    id: "fallback-9",
+    url: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&q=80",
+    thumbUrl:
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80",
+    width: 1200,
+    height: 1500,
+    takenAt: null,
+    isVideo: false,
+    lat: null,
+    lon: null,
+    city: null,
+  },
 ];
 
 // The trip happened in Japan, so "day" boundaries are computed in Asia/Tokyo
@@ -60,7 +178,11 @@ const FALLBACK_PHOTOS: GalleryPhoto[] = [
 // would see photos grouped into different days, or the same day rendered
 // under two different-looking labels.
 const TRIP_TIME_ZONE = "Asia/Tokyo";
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", timeZone: TRIP_TIME_ZONE });
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "short",
+  timeZone: TRIP_TIME_ZONE,
+});
 const dayKeyFormatter = new Intl.DateTimeFormat("en-CA", {
   year: "numeric",
   month: "2-digit",
@@ -102,18 +224,32 @@ function useColumnCount() {
 
     update();
     queries.forEach((mq) => mq.addEventListener("change", update));
-    return () => queries.forEach((mq) => mq.removeEventListener("change", update));
+    return () =>
+      queries.forEach((mq) => mq.removeEventListener("change", update));
   }, []);
 
   return columns;
 }
 
 function SkeletonGrid() {
-  const heights = ["h-72", "h-96", "h-64", "h-80", "h-[28rem]", "h-72", "h-96", "h-64", "h-80"];
+  const heights = [
+    "h-72",
+    "h-96",
+    "h-64",
+    "h-80",
+    "h-[28rem]",
+    "h-72",
+    "h-96",
+    "h-64",
+    "h-80",
+  ];
   return (
     <div className="columns-1 gap-6 space-y-6 sm:columns-2 lg:columns-3 xl:columns-4">
       {heights.map((h, i) => (
-        <Skeleton key={i} className={`w-full break-inside-avoid rounded-lg bg-white/5 ${h}`} />
+        <Skeleton
+          key={i}
+          className={`w-full break-inside-avoid rounded-lg bg-white/5 ${h}`}
+        />
       ))}
     </div>
   );
@@ -130,7 +266,9 @@ const FALLBACK_RESPONSE: PhotosResponse = {
 };
 
 export default function GalleryPage() {
-  const [storyChapters, setStoryChapters] = useState<ResolvedStoryChapter[]>([]);
+  const [storyChapters, setStoryChapters] = useState<ResolvedStoryChapter[]>(
+    [],
+  );
   const [data, setData] = useState<PhotosResponse | null>(null);
   const [loadedQuery, setLoadedQuery] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -149,7 +287,10 @@ export default function GalleryPage() {
   // The page and the two filters all map to one request, so they are tracked
   // as a single key: `loading` is then just "what's on screen isn't what was
   // asked for yet", with no separate boolean to keep in sync.
-  const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(PAGE_SIZE),
+  });
   if (selectedDay) params.set("day", selectedDay);
   if (selectedCity) params.set("city", selectedCity);
   const query = params.toString();
@@ -226,8 +367,12 @@ export default function GalleryPage() {
     return cols;
   }, [items, columns]);
 
-  const selected = selectedPhotoId ? items.find((item) => item.id === selectedPhotoId) ?? null : null;
-  const selectedIndex = selectedPhotoId ? items.findIndex((item) => item.id === selectedPhotoId) : -1;
+  const selected = selectedPhotoId
+    ? (items.find((item) => item.id === selectedPhotoId) ?? null)
+    : null;
+  const selectedIndex = selectedPhotoId
+    ? items.findIndex((item) => item.id === selectedPhotoId)
+    : -1;
   const hasPrev = selectedIndex > 0;
   const hasNext = selectedIndex !== -1 && selectedIndex < items.length - 1;
 
@@ -255,7 +400,9 @@ export default function GalleryPage() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [selectedPhotoId, goToPrev, goToNext]);
 
-  const selectedDayLabel = selectedDay ? days.find((d) => d.key === selectedDay)?.label ?? null : null;
+  const selectedDayLabel = selectedDay
+    ? (days.find((d) => d.key === selectedDay)?.label ?? null)
+    : null;
 
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
   const [removePassword, setRemovePassword] = useState("");
@@ -274,16 +421,28 @@ export default function GalleryPage() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setRemoveError(typeof body.error === "string" ? body.error : "Não foi possível remover.");
+        setRemoveError(
+          typeof body.error === "string"
+            ? body.error
+            : "Não foi possível remover.",
+        );
         return;
       }
       const removedId = selected.id;
       // Password stays in state (not persisted) so removing several photos in
       // one sitting doesn't mean retyping it each time.
-      const nextId = hasNext ? items[selectedIndex + 1].id : hasPrev ? items[selectedIndex - 1].id : null;
+      const nextId = hasNext
+        ? items[selectedIndex + 1].id
+        : hasPrev
+          ? items[selectedIndex - 1].id
+          : null;
       setData((prev) =>
         prev
-          ? { ...prev, photos: prev.photos.filter((p) => p.id !== removedId), total: Math.max(0, prev.total - 1) }
+          ? {
+              ...prev,
+              photos: prev.photos.filter((p) => p.id !== removedId),
+              total: Math.max(0, prev.total - 1),
+            }
           : prev,
       );
       setSelectedPhotoId(nextId);
@@ -296,328 +455,389 @@ export default function GalleryPage() {
   }, [selected, removePassword, hasNext, hasPrev, items, selectedIndex]);
 
   return (
-    <div className="mx-auto max-w-[1800px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16">
-      <header className="mb-8">
-        <h1 className="text-2xl font-light tracking-wide text-white sm:text-3xl">
-          Viagem ao Japão 🇯🇵
-        </h1>
-        <p className="mt-2 text-sm font-light text-zinc-500">
-          Fotos da nossa viagem, para relembrar e compartilhar com a galera.
-        </p>
-      </header>
+    <>
+      <div className="mx-auto max-w-[1800px] px-6 py-10 sm:px-10 sm:py-14 lg:px-16">
+        <header className="mb-8">
+          <h1 className="text-2xl font-light tracking-wide text-white sm:text-3xl">
+            Viagem ao Japão 🇯🇵
+          </h1>
+          <p className="mt-2 text-sm font-light text-zinc-500">
+            Fotos da nossa viagem, para relembrar e compartilhar com a galera.
+          </p>
+        </header>
 
-      <StorySection chapters={storyChapters} />
-
-      {days.length > 1 && (
-        <div className="mb-10">
-          <button
-            type="button"
-            onClick={() => setDayFilterOpen((v) => !v)}
-            aria-expanded={dayFilterOpen}
-            className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
-          >
-            <span>Filtrar por datas{selectedDayLabel ? ` · ${selectedDayLabel}` : ""}</span>
-            <ChevronDown size={14} className={cn("shrink-0 transition-transform", dayFilterOpen && "rotate-180")} />
-          </button>
-          <div className={cn("flex-wrap gap-2 sm:flex", dayFilterOpen ? "flex" : "hidden")}>
+        <StorySection chapters={storyChapters} />
+        <div style={{ marginTop: "-2rem", marginBottom: "2rem" }}>
+          <HeroMarquee />
+        </div>
+        {days.length > 1 && (
+          <div className="mb-10">
             <button
               type="button"
-              onClick={() => {
-                changeFilter(() => setSelectedDay(null));
-                setDayFilterOpen(false);
-              }}
+              onClick={() => setDayFilterOpen((v) => !v)}
+              aria-expanded={dayFilterOpen}
+              className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
+            >
+              <span>
+                Filtrar por datas
+                {selectedDayLabel ? ` · ${selectedDayLabel}` : ""}
+              </span>
+              <ChevronDown
+                size={14}
+                className={cn(
+                  "shrink-0 transition-transform",
+                  dayFilterOpen && "rotate-180",
+                )}
+              />
+            </button>
+            <div
               className={cn(
-                "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-                selectedDay === null
-                  ? "border-white bg-white text-black"
-                  : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                "flex-wrap gap-2 sm:flex",
+                dayFilterOpen ? "flex" : "hidden",
               )}
             >
-              Todas
-            </button>
-            {days.map((day) => (
               <button
-                key={day.key}
                 type="button"
                 onClick={() => {
-                  changeFilter(() => setSelectedDay(day.key));
+                  changeFilter(() => setSelectedDay(null));
                   setDayFilterOpen(false);
                 }}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-light tracking-wide capitalize transition-colors",
-                  selectedDay === day.key
+                  "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
+                  selectedDay === null
                     ? "border-white bg-white text-black"
                     : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
                 )}
               >
-                {day.label}
+                Todas
               </button>
-            ))}
+              {days.map((day) => (
+                <button
+                  key={day.key}
+                  type="button"
+                  onClick={() => {
+                    changeFilter(() => setSelectedDay(day.key));
+                    setDayFilterOpen(false);
+                  }}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-light tracking-wide capitalize transition-colors",
+                    selectedDay === day.key
+                      ? "border-white bg-white text-black"
+                      : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                  )}
+                >
+                  {day.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {cities.length > 1 && (
-        <div className="mb-10">
-          <button
-            type="button"
-            onClick={() => setCityFilterOpen((v) => !v)}
-            aria-expanded={cityFilterOpen}
-            className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
-          >
-            <span>Filtrar por cidades{selectedCity ? ` · ${selectedCity}` : ""}</span>
-            <ChevronDown size={14} className={cn("shrink-0 transition-transform", cityFilterOpen && "rotate-180")} />
-          </button>
-          <div className={cn("flex-wrap gap-2 sm:flex", cityFilterOpen ? "flex" : "hidden")}>
+        {cities.length > 1 && (
+          <div className="mb-10">
             <button
               type="button"
-              onClick={() => {
-                changeFilter(() => setSelectedCity(null));
-                setCityFilterOpen(false);
-              }}
+              onClick={() => setCityFilterOpen((v) => !v)}
+              aria-expanded={cityFilterOpen}
+              className="mb-2 flex w-full items-center justify-between gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs font-light tracking-wide text-zinc-300 sm:hidden"
+            >
+              <span>
+                Filtrar por cidades{selectedCity ? ` · ${selectedCity}` : ""}
+              </span>
+              <ChevronDown
+                size={14}
+                className={cn(
+                  "shrink-0 transition-transform",
+                  cityFilterOpen && "rotate-180",
+                )}
+              />
+            </button>
+            <div
               className={cn(
-                "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-                selectedCity === null
-                  ? "border-white bg-white text-black"
-                  : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                "flex-wrap gap-2 sm:flex",
+                cityFilterOpen ? "flex" : "hidden",
               )}
             >
-              Todos os lugares
-            </button>
-            {cities.map((city) => (
               <button
-                key={city}
                 type="button"
                 onClick={() => {
-                  changeFilter(() => setSelectedCity(city));
+                  changeFilter(() => setSelectedCity(null));
                   setCityFilterOpen(false);
                 }}
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
-                  selectedCity === city
+                  selectedCity === null
                     ? "border-white bg-white text-black"
                     : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
                 )}
               >
-                {city}
+                Todos os lugares
               </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {data && data.total > 0 && (
-        <p className="mb-4 text-xs font-light tracking-wide text-zinc-500">
-          {data.total} {data.total === 1 ? "item" : "itens"}
-          {data.totalPages > 1 && ` — página ${data.page} de ${data.totalPages}`}
-        </p>
-      )}
-
-      <div id="gallery" ref={gridRef} className="scroll-mt-10">
-        {data === null ? (
-          <SkeletonGrid />
-        ) : items.length === 0 ? (
-          <p className="py-20 text-center text-sm font-light text-zinc-500">
-            Nenhuma foto para esse filtro.
-          </p>
-        ) : (
-          <div className={cn("flex gap-6 transition-opacity duration-200", loading && "opacity-40")}>
-            {columnItems.map((col, columnIndex) => (
-              <div key={columnIndex} className="flex flex-1 flex-col gap-6">
-                {col.map((photo) => (
-                  <button
-                    key={photo.id}
-                    type="button"
-                    onClick={() => setSelectedPhotoId(photo.id)}
-                    className="group relative block w-full overflow-hidden rounded-lg bg-[#121212] text-left"
-                  >
-                    <GradedImage
-                      src={photo.thumbUrl}
-                      alt={photo.dateLabel ? `Foto de ${photo.dateLabel}` : "Foto da viagem"}
-                      width={photo.width}
-                      height={photo.height}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="h-auto w-full transform-gpu object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                      loading="lazy"
-                    />
-
-                    {photo.isVideo && (
-                      <>
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/30">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-transform group-hover:scale-110">
-                            <Play size={18} className="ml-0.5 fill-white text-white" />
-                          </div>
-                        </div>
-                        <Badge
-                          variant="secondary"
-                          className="absolute top-3 right-3 border-white/10 bg-black/60 text-[10px] font-light tracking-wide text-zinc-100"
-                        >
-                          Vídeo
-                        </Badge>
-                      </>
-                    )}
-
-                    {photo.dateLabel && (
-                      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/0 to-black/0 p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                        <Badge
-                          variant="secondary"
-                          className="w-fit border-white/10 bg-white/10 text-[11px] font-light tracking-wide text-zinc-200"
-                        >
-                          {photo.dateLabel}
-                        </Badge>
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ))}
+              {cities.map((city) => (
+                <button
+                  key={city}
+                  type="button"
+                  onClick={() => {
+                    changeFilter(() => setSelectedCity(city));
+                    setCityFilterOpen(false);
+                  }}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-light tracking-wide transition-colors",
+                    selectedCity === city
+                      ? "border-white bg-white text-black"
+                      : "border-white/15 text-zinc-400 hover:border-white/30 hover:text-white",
+                  )}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
           </div>
         )}
-      </div>
 
-      <GalleryPagination
-        page={data?.page ?? 1}
-        totalPages={data?.totalPages ?? 1}
-        onPageChange={setPage}
-        disabled={loading}
-      />
+        {data && data.total > 0 && (
+          <p className="mb-4 text-xs font-light tracking-wide text-zinc-500">
+            {data.total} {data.total === 1 ? "item" : "itens"}
+            {data.totalPages > 1 &&
+              ` — página ${data.page} de ${data.totalPages}`}
+          </p>
+        )}
 
-      <Dialog
-        open={selectedPhotoId !== null}
-        onOpenChange={(open) => {
-          if (!open) setSelectedPhotoId(null);
-        }}
-      >
-        <DialogContent
-          showCloseButton
-          className="max-w-[95vw] border-none bg-transparent p-0 ring-0 sm:max-w-[90vw]"
-        >
-          <DialogTitle className="sr-only">
-            {selected?.dateLabel ? `Foto de ${selected.dateLabel}` : "Foto da viagem"}
-          </DialogTitle>
-          {selected && (
-            <div className="flex max-h-[90vh] w-full items-center justify-center">
-              {selected.isVideo ? (
-                <video
-                  key={selected.id}
-                  src={selected.url}
-                  poster={selected.thumbUrl}
-                  controls
-                  className="max-h-[90vh] w-auto rounded-lg"
-                />
-              ) : (
-                <GradedImage
-                  src={selected.url}
-                  alt={selected.dateLabel ? `Foto de ${selected.dateLabel}` : "Foto da viagem"}
-                  width={selected.width}
-                  height={selected.height}
-                  sizes="95vw"
-                  className="max-h-[90vh] w-auto object-contain"
-                  wrapperClassName="max-h-[90vh] overflow-hidden rounded-lg"
-                  priority
-                />
+        <div id="gallery" ref={gridRef} className="scroll-mt-10">
+          {data === null ? (
+            <SkeletonGrid />
+          ) : items.length === 0 ? (
+            <p className="py-20 text-center text-sm font-light text-zinc-500">
+              Nenhuma foto para esse filtro.
+            </p>
+          ) : (
+            <div
+              className={cn(
+                "flex gap-6 transition-opacity duration-200",
+                loading && "opacity-40",
               )}
+            >
+              {columnItems.map((col, columnIndex) => (
+                <div key={columnIndex} className="flex flex-1 flex-col gap-6">
+                  {col.map((photo) => (
+                    <button
+                      key={photo.id}
+                      type="button"
+                      onClick={() => setSelectedPhotoId(photo.id)}
+                      className="group relative block w-full overflow-hidden rounded-lg bg-[#121212] text-left"
+                    >
+                      <GradedImage
+                        src={photo.thumbUrl}
+                        alt={
+                          photo.dateLabel
+                            ? `Foto de ${photo.dateLabel}`
+                            : "Foto da viagem"
+                        }
+                        width={photo.width}
+                        height={photo.height}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="h-auto w-full transform-gpu object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        loading="lazy"
+                      />
+
+                      {photo.isVideo && (
+                        <>
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition-colors group-hover:bg-black/30">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm transition-transform group-hover:scale-110">
+                              <Play
+                                size={18}
+                                className="ml-0.5 fill-white text-white"
+                              />
+                            </div>
+                          </div>
+                          <Badge
+                            variant="secondary"
+                            className="absolute top-3 right-3 border-white/10 bg-black/60 text-[10px] font-light tracking-wide text-zinc-100"
+                          >
+                            Vídeo
+                          </Badge>
+                        </>
+                      )}
+
+                      {photo.dateLabel && (
+                        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/0 to-black/0 p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                          <Badge
+                            variant="secondary"
+                            className="w-fit border-white/10 bg-white/10 text-[11px] font-light tracking-wide text-zinc-200"
+                          >
+                            {photo.dateLabel}
+                          </Badge>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              ))}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
 
-      {selected && hasPrev && (
-        // Rendered outside the dialog (fixed to the viewport, not to the
-        // image-hugging popup) with a wide tap zone and a safe margin from
-        // the backdrop — for wide photos the popup nearly fills the screen,
-        // so a button glued to its edge left a near-zero-margin strip where
-        // a slightly-off tap hit the backdrop and closed the whole viewer
-        // instead of advancing.
-        <button
-          type="button"
-          onClick={goToPrev}
-          aria-label="Foto anterior"
-          className="fixed top-1/2 left-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-start pl-2 sm:w-24 sm:pl-4"
-        >
-          <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
-            <ChevronLeft size={20} />
-          </span>
-        </button>
-      )}
-      {selected && hasNext && (
-        <button
-          type="button"
-          onClick={goToNext}
-          aria-label="Próxima foto"
-          className="fixed top-1/2 right-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-end pr-2 sm:w-24 sm:pr-4"
-        >
-          <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
-            <ChevronRight size={20} />
-          </span>
-        </button>
-      )}
-      {selected && (
-        // Top-left, clear of the close button (top-right, inside the popup)
-        // and of the nav buttons on the side edges.
-        <button
-          type="button"
-          onClick={() => {
-            setRemoveError(null);
-            setRemoveDialogOpen(true);
+        <GalleryPagination
+          page={data?.page ?? 1}
+          totalPages={data?.totalPages ?? 1}
+          onPageChange={setPage}
+          disabled={loading}
+        />
+
+        <Dialog
+          open={selectedPhotoId !== null}
+          onOpenChange={(open) => {
+            if (!open) setSelectedPhotoId(null);
           }}
-          aria-label="Remover esta foto"
-          className="fixed top-4 left-4 z-[60] flex size-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-red-500/70"
         >
-          <Trash2 size={18} />
-        </button>
-      )}
-
-      <Dialog
-        open={removeDialogOpen}
-        onOpenChange={(open) => {
-          setRemoveDialogOpen(open);
-          if (!open) setRemoveError(null);
-        }}
-      >
-        <DialogContent>
-          <DialogTitle>Remover foto</DialogTitle>
-          <DialogDescription>
-            A foto sai da galeria (continua guardada — dá pra restaurar se for engano).
-          </DialogDescription>
-          {selected && (
-            <div className="flex justify-center py-2">
-              <Image
-                src={selected.thumbUrl}
-                alt=""
-                width={96}
-                height={96}
-                className="h-24 w-24 rounded-lg object-cover"
-              />
-            </div>
-          )}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              confirmRemove();
-            }}
-            className="flex flex-col gap-3"
+          <DialogContent
+            showCloseButton
+            className="max-w-[95vw] border-none bg-transparent p-0 ring-0 sm:max-w-[90vw]"
           >
-            <input
-              type="password"
-              value={removePassword}
-              onChange={(e) => setRemovePassword(e.target.value)}
-              placeholder="Senha"
-              autoFocus
-              className="w-full rounded-lg border border-white/15 bg-transparent px-3 py-2 text-sm text-white outline-none focus:border-white/40"
-            />
-            {removeError && <p className="text-xs text-red-400">{removeError}</p>}
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setRemoveDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit" variant="destructive" disabled={removing || !removePassword}>
-                {removing ? "Removendo…" : "Remover"}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogTitle className="sr-only">
+              {selected?.dateLabel
+                ? `Foto de ${selected.dateLabel}`
+                : "Foto da viagem"}
+            </DialogTitle>
+            {selected && (
+              <div className="flex max-h-[90vh] w-full items-center justify-center">
+                {selected.isVideo ? (
+                  <video
+                    key={selected.id}
+                    src={selected.url}
+                    poster={selected.thumbUrl}
+                    controls
+                    className="max-h-[90vh] w-auto rounded-lg"
+                  />
+                ) : (
+                  <GradedImage
+                    src={selected.url}
+                    alt={
+                      selected.dateLabel
+                        ? `Foto de ${selected.dateLabel}`
+                        : "Foto da viagem"
+                    }
+                    width={selected.width}
+                    height={selected.height}
+                    sizes="95vw"
+                    className="max-h-[90vh] w-auto object-contain"
+                    wrapperClassName="max-h-[90vh] overflow-hidden rounded-lg"
+                    priority
+                  />
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {selected && hasPrev && (
+          // Rendered outside the dialog (fixed to the viewport, not to the
+          // image-hugging popup) with a wide tap zone and a safe margin from
+          // the backdrop — for wide photos the popup nearly fills the screen,
+          // so a button glued to its edge left a near-zero-margin strip where
+          // a slightly-off tap hit the backdrop and closed the whole viewer
+          // instead of advancing.
+          <button
+            type="button"
+            onClick={goToPrev}
+            aria-label="Foto anterior"
+            className="fixed top-1/2 left-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-start pl-2 sm:w-24 sm:pl-4"
+          >
+            <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
+              <ChevronLeft size={20} />
+            </span>
+          </button>
+        )}
+        {selected && hasNext && (
+          <button
+            type="button"
+            onClick={goToNext}
+            aria-label="Próxima foto"
+            className="fixed top-1/2 right-0 z-[60] flex h-32 w-16 -translate-y-1/2 items-center justify-end pr-2 sm:w-24 sm:pr-4"
+          >
+            <span className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
+              <ChevronRight size={20} />
+            </span>
+          </button>
+        )}
+        {selected && (
+          // Top-left, clear of the close button (top-right, inside the popup)
+          // and of the nav buttons on the side edges.
+          <button
+            type="button"
+            onClick={() => {
+              setRemoveError(null);
+              setRemoveDialogOpen(true);
+            }}
+            aria-label="Remover esta foto"
+            className="fixed top-4 left-4 z-[60] flex size-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-red-500/70"
+          >
+            <Trash2 size={18} />
+          </button>
+        )}
+
+        <Dialog
+          open={removeDialogOpen}
+          onOpenChange={(open) => {
+            setRemoveDialogOpen(open);
+            if (!open) setRemoveError(null);
+          }}
+        >
+          <DialogContent>
+            <DialogTitle>Remover foto</DialogTitle>
+            <DialogDescription>
+              A foto sai da galeria (continua guardada — dá pra restaurar se for
+              engano).
+            </DialogDescription>
+            {selected && (
+              <div className="flex justify-center py-2">
+                <Image
+                  src={selected.thumbUrl}
+                  alt=""
+                  width={96}
+                  height={96}
+                  className="h-24 w-24 rounded-lg object-cover"
+                />
+              </div>
+            )}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                confirmRemove();
+              }}
+              className="flex flex-col gap-3"
+            >
+              <input
+                type="password"
+                value={removePassword}
+                onChange={(e) => setRemovePassword(e.target.value)}
+                placeholder="Senha"
+                autoFocus
+                className="w-full rounded-lg border border-white/15 bg-transparent px-3 py-2 text-sm text-white outline-none focus:border-white/40"
+              />
+              {removeError && (
+                <p className="text-xs text-red-400">{removeError}</p>
+              )}
+              <div className="flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setRemoveDialogOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={removing || !removePassword}
+                >
+                  {removing ? "Removendo…" : "Remover"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </>
   );
 }

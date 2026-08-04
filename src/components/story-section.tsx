@@ -115,13 +115,6 @@ export function StorySection({ chapters }: { chapters: ResolvedStoryChapter[] })
         </article>
       ))}
 
-      <a
-        href="#gallery"
-        className="mx-auto flex w-fit items-center gap-2 rounded-full border border-white/15 px-5 py-2 text-xs font-light tracking-wide text-zinc-300 transition-colors hover:border-white/30 hover:text-white"
-      >
-        Ver todas as fotos ↓
-      </a>
-
       <Dialog
         open={active !== null}
         onOpenChange={(open) => {
